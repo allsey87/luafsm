@@ -44,5 +44,5 @@ An advanced example is provided in [advanced_example.lua](advanced_example.lua).
 2. The code allows for quite a compact representation of a complex state machine
 
 ### Disadvantages
-1. Harder to debug. Error messages returned by the Lua interpreter will 
+1. Harder to debug. Error reported by the Lua interpreter will point to the code doing the parsing even if the error is in your state machine description.
 2. Adding and removing states is currently not supported (and may be difficult to implement)
