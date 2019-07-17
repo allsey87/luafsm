@@ -22,7 +22,7 @@ function printer(str, transition)
       end 
    end
    state.entry = 1
-   state.exit = function() return true, transition end
+   state.exit = {true, transition}
    return state
 end
 
@@ -44,16 +44,14 @@ print_hello_world = {
             print_l = new_char_printer("l", "print_d"),
             print_d = new_char_printer("d"),
          },
-         exit = function()
-            return true, "print_exclamation_mark"
-         end,
+         exit = {true, "print_exclamation_mark"}
       },
       print_exclamation_mark = function()
          print("!")
          return true
       end,
    },
-   exit = function() return true end,
+   exit = true,
 }
 
 -- create an instance of the state machine

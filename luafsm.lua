@@ -3,41 +3,55 @@ local luafsm = {}
 
 -- define the create function
 function luafsm.create(state)
-   -- simple state
+   -- basic state
    if type(state) == "function" then
       return state
    -- super state
    elseif type(state) == "table" then
-      local substates = {}
+      local entry = state.entry
+      local exit = state.exit
       local current = nil
-      local entry = nil
-      local exit = nil
+      local substates = {}
       -- recursively construct substates
       for identifer, substate in pairs(state.substates) do
          substates[identifer] = luafsm.create(substate)
       end
-      -- set the entry state
-      entry = state.entry
-      current = state.entry
-      if state.exit then
-         exit = state.exit
-      else
-         -- default exit function
-         exit = function() return true end
-      end
-      -- generate a super state function
+      -- generate and return a super state function
       return function()
-         --print("current = " .. current)
+         if current == nil then
+            if type(entry) == "function" then
+               current = entry()
+            else
+               current = entry
+            end
+         end
+         -- execute the current substate
          done, next = substates[current]()
          if done then
+            -- done is true, the current substate has finished executing
             if next then
                current = next
                return false
             else
-               current = entry
-               return exit()
+               -- no next state
+               -- reset the current state to nil
+               current = nil
+               if exit then
+                  -- exit was defined
+                  if type(exit) == "table" then
+                     return unpack(exit)
+                  elseif type(exit) == "function" then
+                     return exit()
+                  else
+                     return exit
+                  end
+               else
+                  -- exit was not defined
+                  return true
+               end
             end
          else
+            -- done is false, the current substate is still executing
             return false
          end
       end
